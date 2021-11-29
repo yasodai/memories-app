@@ -1,0 +1,26 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200;0,300;0,400;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,600;1,700;1,800;1,900&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #f7f8fc;
+  font-family: "Nunito", sans-serif;
+}
+
+input,
+textarea {
+  @apply w-full  outline-none;
+  @apply placeholder-transparent;
+  @apply border-b-2 focus:border-pink-500;
+}
+
+.paginate {
+  @apply flex bg-gray-100 justify-between  py-2 px-3 font-bold text-lg text-pink-500 rounded select-none;
+}
+.round-effect {
+  @apply px-2.5 rounded hover:text-white hover:bg-pink-500;
+}
+.active {
+  @apply text-white bg-pink-500;
+}
