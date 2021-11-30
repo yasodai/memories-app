@@ -1,11 +1,13 @@
 import create from "zustand";
-
 import { api } from "../api";
+import { validateEmail } from "@/utils";
+
 export default create((set, get) => ({
   posts: { data: [] },
   post: {},
   loading: false,
   authData: null,
+  error: "",
   authLogin: (data) => {
     set({ authData: data });
     localStorage.setItem("profile", JSON.stringify(data));
@@ -128,15 +130,35 @@ export default create((set, get) => ({
       );
   },
   signIn: async (formData, navigate) => {
-    api.signIn(formData).then(({ data }) => {
-      get().authLogin(data);
-      navigate("/");
-    });
+    api
+      .signIn(formData)
+      .then(({ data }) => {
+        get().authLogin(data);
+        navigate("/");
+      })
+      .catch((error) => {
+        if (error.response) {
+          set({ error: error.response.data.message });
+        }
+      });
   },
   signUp: async (formData, navigate) => {
-    api.signUp(formData).then(({ data }) => {
-      get().authLogin(data);
-      navigate("/");
-    });
+    if (validateEmail(formData.email)) {
+      api
+        .signUp(formData)
+        .then(({ data }) => {
+          if (data) {
+            get().authLogin(data);
+            navigate("/");
+          }
+        })
+        .catch((error) => {
+          if (error.response) {
+            set({ error: error.response.data.message });
+          }
+        });
+    } else {
+      set({ error: "Please enter a valid email" });
+    }
   },
 }));

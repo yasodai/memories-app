@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { GoogleLogin } from "react-google-login";
 
-import { clsx } from "./../utils";
+import { clsx, validateEmail } from "./../utils";
 import { Label, Icon } from "@/components";
 import useStore from "@/app/store";
 import { useNavigate } from "react-router-dom";
@@ -12,20 +12,14 @@ export function Auth() {
   const signUp = useStore((state) => state.signUp);
   const navigate = useNavigate();
   const [isSignup, setIsSignup] = useState(false);
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
+
+  const message = useStore((state) => state.error);
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    isSignup ? signUp(formData, navigate) : signIn(formData, navigate);
-  };
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const form = new FormData(event.currentTarget);
+    const data = Object.fromEntries(form.entries());
+    isSignup ? signUp(data, navigate) : signIn(data, navigate);
   };
 
   const googleSuccess = async (res) => {
@@ -39,7 +33,6 @@ export function Auth() {
     console.log("Google Sign In was unsuccessful. Try Again Later", error);
     console.log(details);
   };
-
   return (
     <form
       onSubmit={handleSubmit}
@@ -60,8 +53,8 @@ export function Auth() {
         <div className="flex gap-3">
           <Label type="firstName" placeholder="First Name">
             <input
+              required
               className="peer h-10"
-              onChange={handleChange}
               type="text"
               name="firstName"
               id="firstName"
@@ -70,8 +63,8 @@ export function Auth() {
           </Label>
           <Label type="lastName" placeholder="Last Name">
             <input
+              required
               className="peer h-10"
-              onChange={handleChange}
               type="text"
               name="lastName"
               id="lastName"
@@ -82,8 +75,8 @@ export function Auth() {
       )}
       <Label type="email" placeholder="Email Address">
         <input
+          required
           className="peer h-10"
-          onChange={handleChange}
           type="text"
           name="email"
           id="email"
@@ -92,8 +85,8 @@ export function Auth() {
       </Label>
       <Label type="password" placeholder="Password ">
         <input
+          required
           className="peer h-10"
-          onChange={handleChange}
           type="password"
           name="password"
           id="password"
@@ -104,8 +97,8 @@ export function Auth() {
       {isSignup && (
         <Label type="confirmPassword" placeholder="Repeat Password ">
           <input
+            required
             className="peer h-10"
-            onChange={handleChange}
             type="password"
             name="confirmPassword"
             id="confirmPassword"
@@ -113,6 +106,7 @@ export function Auth() {
           />
         </Label>
       )}
+      {message && <p className="text-red-500">{message}</p>}
       <button
         type="submit"
         className={clsx(
